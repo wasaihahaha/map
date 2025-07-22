@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>XYZ瓦片地图</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ol@v7.3.0/ol.css">
+  <link rel="stylesheet" href="https://cesium.com/downloads/cesiumjs/releases/1.95/Build/Cesium/Widgets/widgets.css">
+  <style>
+    #map {
+      width: 100%;
+      height: 100vh;
+    }
+  </style>
+</head>
+<body>
+  <div id="map"></div>
+  
+  <script src="https://cdn.jsdelivr.net/npm/ol@v7.3.0/dist/ol.js"></script>
+
+  <script src="https://cesium.com/downloads/cesiumjs/releases/1.95/Build/Cesium/Cesium.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/ol-cesium@2.10.0/dist/olcesium.js"></script>
+
+  <script>
+   
+ var map = new ol.Map({
+      target: 'map',
+      layers: [
+        new ol.layer.Tile({
+          source: new ol.source.XYZ({
+              url: 'http://159.226.19.11:8090/dianzi_map/{z}/{x}/{y}.png'
+          })
+        })
+      ],
+      view: new ol.View({
+        center: ol.proj.fromLonLat([116.404, 39.915]),
+        zoom: 10
+      })
+    });
+
+
+  // 矢量要素容器
+    const vectorSource = new ol.source.Vector();
+    const vectorLayer = new ol.layer.Vector({
+      source: vectorSource,
+      style: function(feature) {
+        const geomType = feature.getGeometry().getType();
+        return new ol.style.Style({
+          image: geomType === 'Point' ? new ol.style.Circle({
+            radius: 10,
+            fill: new ol.style.Fill({color: '#FF0000'}),
+            stroke: new ol.style.Stroke({color: '#FFFFFF', width: 2})
+          }) : null,
+          stroke: new ol.style.Stroke({
+            color: '#0000FF',
+            width: geomType === 'LineString' ? 3 : 2
+          }),
+          fill: geomType === 'Polygon' ? new ol.style.Fill({
+            color: 'rgba(0, 255, 0, 0.3)'
+          }) : null
+        });
+      }
+    });
+    map.addLayer(vectorLayer);
+
+
+
+
+// 预置点要素（天安门坐标）
+    const pointFeature = new ol.Feature({
+      geometry: new ol.geom.Point(ol.proj.fromLonLat([116.397, 39.908]))
+    });
+
+ 
+    // 预置线要素（长安街部分路段）
+    const lineFeature = new ol.Feature({
+      geometry: new ol.geom.LineString([
+        ol.proj.fromLonLat([116.35, 39.908]),
+        ol.proj.fromLonLat([116.45, 39.908])
+      ])
+    });
+    
+    // 预置多边形要素（故宫轮廓简化版）
+    const polygonFeature = new ol.Feature({
+      geometry: new ol.geom.Polygon([[
+        ol.proj.fromLonLat([116.397, 39.918]),
+        ol.proj.fromLonLat([116.397, 39.908]),
+        ol.proj.fromLonLat([116.407, 39.908]),
+        ol.proj.fromLonLat([116.407, 39.918]),
+        ol.proj.fromLonLat([116.397, 39.918])
+      ]])
+    });
+
+    vectorSource.addFeatures([pointFeature, lineFeature, polygonFeature]);
+
+
+
+
+
+
+
+
+    // 初始化3D视图
+ //   const ol3d = new olcs.OLCesium({map: map});
+ //   const scene = ol3d.getCesiumScene();
+
+    // 启用3D模式
+  //  ol3d.setEnabled(true);
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  </script>
+</body>
+</html>
